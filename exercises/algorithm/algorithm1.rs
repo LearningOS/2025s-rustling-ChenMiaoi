@@ -2,13 +2,11 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
-
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
-use std::vec::*;
+use std::{cmp, vec::*};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Node<T> {
     val: T,
     next: Option<NonNull<Node<T>>>,
@@ -22,20 +20,20 @@ impl<T> Node<T> {
         }
     }
 }
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct LinkedList<T> {
     length: u32,
     start: Option<NonNull<Node<T>>>,
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T: Clone + PartialOrd> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T: Clone + PartialOrd> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -69,14 +67,38 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+	pub fn merge(mut list_a:LinkedList<T>, mut list_b:LinkedList<T>) -> Self {
+        let mut merge_list: LinkedList<T> = LinkedList::new();
+
+        let mut len_a: u32 = 0;
+        let mut len_b: u32 = 0;
+
+        while len_a < list_a.length && len_b < list_b.length {
+            let val_a = list_a.get(len_a as i32).unwrap().clone();
+            let val_b = list_b.get(len_b as i32).unwrap().clone();
+
+            if val_a <= val_b {
+                merge_list.add(val_a);
+                len_a += 1;
+            } else {
+                merge_list.add(val_b);
+                len_b += 1;
+            }
         }
+
+        while len_a < list_a.length {
+            let val = list_a.get(len_a as i32).unwrap().clone();
+            merge_list.add(val);
+            len_a += 1;
+        }
+
+        while len_b < list_b.length {
+            let val = list_b.get(len_b as i32).unwrap().clone();
+            merge_list.add(val);
+            len_b += 1;
+        }
+
+        merge_list
 	}
 }
 
